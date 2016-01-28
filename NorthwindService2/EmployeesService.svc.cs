@@ -45,10 +45,43 @@ namespace NorthwindService2
             return employee;
         }
 
-        public int UpdateEmployee(int id, string lastName, string firstName, string title, string address, string city, string country,
+        public int UpdateEmployee(int employeeId, string lastName, string firstName, string title, string address, string city, string country,
             string notes)
         {
-            throw new NotImplementedException();
+            string query = "UPDATE [NORTHWND].[dbo].[Employees] SET" +
+                           " lastName = @LastName," +
+                           " firstName = @FirstName," +
+                           " title = @Title," +
+                           " address = @Address," +
+                           " city = @City," +
+                           " country = @Country," +
+                           " notes = @Notes" +
+                           " WHERE employeeId = @EmployeeID";
+            using (SqlConnection connection = new SqlConnection(connectionString))
+            {
+                SqlCommand commande = new SqlCommand(query,connection);
+
+                SqlParameter parameterId = new SqlParameter("@EmployeeID", employeeId);
+                commande.Parameters.Add(parameterId);
+                SqlParameter parameterLastname = new SqlParameter("@LastName", lastName);
+                commande.Parameters.Add(parameterLastname);
+                SqlParameter parameterFirstname = new SqlParameter("@FirstName", firstName);
+                commande.Parameters.Add(parameterFirstname);
+                SqlParameter parameterTitle = new SqlParameter("@Title", title);
+                commande.Parameters.Add(parameterTitle);
+                SqlParameter parameterAddress = new SqlParameter("@Address", address);
+                commande.Parameters.Add(parameterAddress);
+                SqlParameter parameterCity = new SqlParameter("@City", city);
+                commande.Parameters.Add(parameterCity);
+                SqlParameter parameterCountry = new SqlParameter("@Country", country);
+                commande.Parameters.Add(parameterCountry);
+                SqlParameter parameterNotes = new SqlParameter("@Notes", notes);
+                commande.Parameters.Add(parameterNotes);
+
+                connection.Open();
+                return commande.ExecuteNonQuery();
+            }
+            
         }
     }
 }
