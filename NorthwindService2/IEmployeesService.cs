@@ -12,10 +12,11 @@ namespace NorthwindService2
     public interface IEmployeesService
     {
         [OperationContract]
-        [FaultContract(typeof(ApplicationException))]
+        [FaultContract(typeof(FaultException))]
         Employees GetEmployeeById(int id);
 
         [OperationContract]
+        [FaultContract(typeof(FaultException))]
         int UpdateEmployee(int id, string lastName, string firstName, string title, 
             string address, string city, string country, string notes);
     }

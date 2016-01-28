@@ -17,6 +17,7 @@ namespace NorthwindService2
         private string connectionString = ConfigurationManager.ConnectionStrings["theDB"].ToString();
         public Employees GetEmployeeById(int id)
         {
+            
             string query =
                 "SELECT [EmployeeID], [LastName], [FirstName], [Title], [Address], [City], [Country], [Notes]" +
                 "FROM [dbo].[Employees]" +
@@ -25,21 +26,37 @@ namespace NorthwindService2
 
             using (var connection = new SqlConnection(connectionString))
             {
-                SqlCommand command = new SqlCommand(query,connection);
-                connection.Open();
-
-                SqlDataReader reader = command.ExecuteReader();
-
-                while (reader.Read())
+                using (SqlCommand command = new SqlCommand(query, connection))
                 {
-                    employee.Id = Convert.ToInt32(reader["EmployeeID"].ToString());
-                    employee.LastName = reader["LastName"].ToString();
-                    employee.FirstName = reader["FirstName"].ToString();
-                    employee.Title = reader["Title"].ToString();
-                    employee.Address = reader["Address"].ToString();
-                    employee.City = reader["City"].ToString();
-                    employee.Country = reader["Country"].ToString();
-                    employee.Notes = reader["Notes"].ToString();
+                    try
+                    {
+                        connection.Open();
+                    }
+                    catch (Exception)
+                    {
+                        throw new Exception("Det gick inte öppna databasen");
+                    }
+                    using (SqlDataReader reader = command.ExecuteReader())
+                    {
+                        while (reader.Read())
+                        {
+                            employee.Id = Convert.ToInt32(reader["EmployeeID"].ToString());
+                            employee.LastName = reader["LastName"].ToString();
+                            employee.FirstName = reader["FirstName"].ToString();
+                            employee.Title = reader["Title"].ToString();
+                            employee.Address = reader["Address"].ToString();
+                            employee.City = reader["City"].ToString();
+                            employee.Country = reader["Country"].ToString();
+                            employee.Notes = reader["Notes"].ToString();
+                        }
+                        var myNull = employee.LastName == null || employee.FirstName == null || employee.Address == null ||
+                                     employee.Country == null || employee.Notes == null || employee.City == null ||
+                                     employee.Title == null;
+                        if (myNull)
+                        {
+                            throw new FaultException("Något gick fel");
+                        }
+                    }
                 }
             }
             return employee;
@@ -59,29 +76,37 @@ namespace NorthwindService2
                            " WHERE employeeId = @EmployeeID";
             using (SqlConnection connection = new SqlConnection(connectionString))
             {
-                SqlCommand commande = new SqlCommand(query,connection);
+                using (SqlCommand commande = new SqlCommand(query, connection))
+                {
+                    SqlParameter parameterId = new SqlParameter("@EmployeeID", employeeId);
+                    commande.Parameters.Add(parameterId);
+                    SqlParameter parameterLastname = new SqlParameter("@LastName", lastName);
+                    commande.Parameters.Add(parameterLastname);
+                    SqlParameter parameterFirstname = new SqlParameter("@FirstName", firstName);
+                    commande.Parameters.Add(parameterFirstname);
+                    SqlParameter parameterTitle = new SqlParameter("@Title", title);
+                    commande.Parameters.Add(parameterTitle);
+                    SqlParameter parameterAddress = new SqlParameter("@Address", address);
+                    commande.Parameters.Add(parameterAddress);
+                    SqlParameter parameterCity = new SqlParameter("@City", city);
+                    commande.Parameters.Add(parameterCity);
+                    SqlParameter parameterCountry = new SqlParameter("@Country", country);
+                    commande.Parameters.Add(parameterCountry);
+                    SqlParameter parameterNotes = new SqlParameter("@Notes", notes);
+                    commande.Parameters.Add(parameterNotes);
 
-                SqlParameter parameterId = new SqlParameter("@EmployeeID", employeeId);
-                commande.Parameters.Add(parameterId);
-                SqlParameter parameterLastname = new SqlParameter("@LastName", lastName);
-                commande.Parameters.Add(parameterLastname);
-                SqlParameter parameterFirstname = new SqlParameter("@FirstName", firstName);
-                commande.Parameters.Add(parameterFirstname);
-                SqlParameter parameterTitle = new SqlParameter("@Title", title);
-                commande.Parameters.Add(parameterTitle);
-                SqlParameter parameterAddress = new SqlParameter("@Address", address);
-                commande.Parameters.Add(parameterAddress);
-                SqlParameter parameterCity = new SqlParameter("@City", city);
-                commande.Parameters.Add(parameterCity);
-                SqlParameter parameterCountry = new SqlParameter("@Country", country);
-                commande.Parameters.Add(parameterCountry);
-                SqlParameter parameterNotes = new SqlParameter("@Notes", notes);
-                commande.Parameters.Add(parameterNotes);
-
-                connection.Open();
-                return commande.ExecuteNonQuery();
+                    try
+                    {
+                        connection.Open();
+                    }
+                    catch (Exception)
+                    {
+                        throw new Exception("Det gick inte öppna databasen");
+                    }
+                    return commande.ExecuteNonQuery();
+                }
             }
-            
         }
     }
 }
+
